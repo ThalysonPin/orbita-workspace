@@ -120,7 +120,11 @@ export function createOrbitaHandler(env: Environment, fetcher: typeof fetch = fe
     let config: EdgeConfig | undefined;
     const headers: Record<string, string> = { ...INTEGRATION_HEADERS, Vary: "Origin", "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info" };
     try {
-      config = await resolveEdgeConfig(env, fetcher); const url = new URL(request.url), prefix = "/functions/v1/orbita-api", path = url.pathname.startsWith(`${prefix}/`) ? url.pathname.slice(prefix.length) : url.pathname;
+      config = await resolveEdgeConfig(env, fetcher);
+      const url = new URL(request.url);
+      // The hosted gateway strips /functions/v1 and retains the function slug.
+      const prefix = ["/functions/v1/orbita-api", "/orbita-api"].find((value) => url.pathname.startsWith(`${value}/`));
+      const path = prefix ? url.pathname.slice(prefix.length) : url.pathname;
       const callback = path === "/integrations/google/callback" && request.method === "GET";
       if (!callback) {
         if (request.headers.get("origin") !== config.allowedOrigin) throw new IntegrationError("invalid_origin", "Origem do aplicativo não autorizada.", 403);

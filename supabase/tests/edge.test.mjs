@@ -46,6 +46,25 @@ test("CORS permits only the exact configured origin; preflight never requires lo
   assert.equal(allowed.status, 204); assert.equal(allowed.headers.get("Access-Control-Allow-Origin"), env.ORBITA_ALLOWED_ORIGIN); assert.equal(h.calls.length, 0);
   for (const origin of ["https://owner.github.io.evil.example", "https://evil.example", "null"]) { const response = await h.handler(request("/workspace", "GET", undefined, { Origin: origin })); assert.equal(response.status, 403); assert.equal(response.headers.get("Access-Control-Allow-Origin"), null); }
 });
+test("hosted gateway function-slug paths preserve authenticated workspace and configuration routes", async () => {
+  const h = harness();
+  for (const prefix of ["/functions/v1/orbita-api", "/orbita-api"]) {
+    let response = await h.handler(new Request(`${env.SUPABASE_URL}${prefix}/workspace`, request("/workspace")));
+    assert.equal(response.status, 200); assert.equal((await response.json()).connections.length, 9);
+    response = await h.handler(new Request(`${env.SUPABASE_URL}${prefix}/integrations?provider=google&companyId=company-1`, request("/integrations")));
+    assert.equal(response.status, 200); assert.equal((await response.json()).settings.saved, false);
+  }
+  const unknown = await h.handler(new Request(`${env.SUPABASE_URL}/orbita-api-other/workspace`, request("/workspace")));
+  assert.equal(unknown.status, 404);
+});
+test("hosted gateway callback path stays public and returns only to the fixed app URL", async () => {
+  const h = harness();
+  const response = await h.handler(new Request(`${env.SUPABASE_URL}/orbita-api/integrations/google/callback?state=invalid`));
+  assert.equal(response.status, 303);
+  assert.equal(new URL(response.headers.get("Location")).origin, env.ORBITA_ALLOWED_ORIGIN);
+  assert.equal(new URL(response.headers.get("Location")).pathname, "/orbita/");
+  assert.ok(h.calls.every((call) => call.url.pathname !== "/auth/v1/user"));
+});
 test("Auth getUser validates the bearer remotely and rejects non-owner or forged sessions before DB reads", async () => {
   const h = harness(); h.setAuth(other);
   assert.equal((await h.handler(request("/workspace"))).status, 403); assert.equal(h.calls.length, 1); assert.equal(h.calls[0].url.pathname, "/auth/v1/user"); assert.equal(h.calls[0].headers.get("Authorization"), "Bearer owner-session");
