@@ -1,0 +1,7 @@
+project_id = "orbita"
+
+[functions.orbita-api]
+# The public Google redirect has no bearer token. Every other route validates
+# the user through Supabase Auth getUser and then enforces ORBITA_OWNER_ID.
+verify_jwt = false
+entrypoint = "./functions/orbita-api/index.ts"

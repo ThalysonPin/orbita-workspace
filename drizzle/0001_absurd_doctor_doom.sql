@@ -1,0 +1,1 @@
+ALTER TABLE `integration_oauth_states` ADD `consumed_at` integer;
