@@ -32,7 +32,7 @@ O workflow **Publicar Órbita no GitHub Pages** publica somente `dist-pages`. O 
 
 | Caminho | Responsabilidade |
 | --- | --- |
-| `pages/` | Aplicação estática e telas de acesso Supabase |
+| `frontend/` | Aplicação estática e telas de acesso Supabase |
 | `lib/workspace-api.ts` | Transporte compartilhado Sites / Supabase |
 | `lib/integration-crypto.ts` | Criptografia AES-GCM |
 | `supabase/functions/orbita-api/` | API autenticada e armazenamento Postgres |

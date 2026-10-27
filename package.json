@@ -14,9 +14,9 @@
     "start": "node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js dev --config dist/server/wrangler.json --local --persist-to .wrangler/state --ip 127.0.0.1 --inspector-port 0",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
-    "build:pages": "vite build --config pages/vite.config.ts",
-    "dev:pages": "vite --config pages/vite.config.ts",
-    "preview:pages": "vite preview --config pages/vite.config.ts --host 127.0.0.1",
+    "build:pages": "vite build --config frontend/vite.config.ts",
+    "dev:pages": "vite --config frontend/vite.config.ts",
+    "preview:pages": "vite preview --config frontend/vite.config.ts --host 127.0.0.1",
     "build:supabase": "node scripts/build-supabase.mjs",
     "auth:create-owner": "node scripts/create-owner.mjs",
     "test:edge": "node scripts/build-supabase.mjs && node --test supabase/tests/*.test.mjs"

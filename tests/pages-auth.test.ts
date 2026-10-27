@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 // @ts-expect-error Node's type-stripping runner uses explicit TypeScript extensions.
-import { isPublicSupabaseKey } from "../pages/public-config.ts";
+import { isPublicSupabaseKey } from "../frontend/public-config.ts";
 // @ts-expect-error Node's type-stripping runner uses explicit TypeScript extensions.
 import { createSupabaseWorkspaceFetch, sameOriginWorkspaceFetch } from "../lib/workspace-api.ts";
 
@@ -31,7 +31,7 @@ test("Vite rejects secret and legacy service-role keys before writing any static
   const output = mkdtempSync(join(tmpdir(), "orbita-public-key-guard-"));
   try {
     for (const privilegedKey of ["sb_secret_unit_test_only", legacyKey({ role: "service_role", iss: "supabase" })]) {
-    const result = spawnSync(process.execPath, [join(root, "node_modules/vite/bin/vite.js"), "build", "--config", "pages/vite.config.ts", "--outDir", output], {
+    const result = spawnSync(process.execPath, [join(root, "node_modules/vite/bin/vite.js"), "build", "--config", "frontend/vite.config.ts", "--outDir", output], {
       cwd: root,
       env: { ...process.env, VITE_SUPABASE_URL: "https://project.example", VITE_SUPABASE_PUBLISHABLE_KEY: privilegedKey, VITE_BASE_PATH: "/unit-test/" },
       encoding: "utf8",
